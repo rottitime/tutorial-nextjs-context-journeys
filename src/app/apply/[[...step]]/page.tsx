@@ -27,11 +27,14 @@ export default async function Page({
   const mod = await stepModules[currentStep]()
   const StepPage = mod.default
 
+  // Store flash data - it will be cleared on next form submission
+  const flashData = session.flash
+
   return (
     <html>
       <body>
-        {session.flash?.message && <div>{session.flash.message}</div>}
-        <StepPage flash={session.flash} values={session.flash?.values} />
+        {flashData?.message && <div>{flashData.message}</div>}
+        <StepPage flash={flashData} values={flashData?.values} />
       </body>
     </html>
   )

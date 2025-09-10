@@ -22,6 +22,11 @@ export async function POST(req: Request) {
 
     const session = await getSessionServer()
 
+    // Clear any existing flash messages when processing a new form submission
+    if (session.flash) {
+      session.flash = undefined
+    }
+
     // Check if this is a form step
     if (validators[formId]) {
       const result = validators[formId].safeParse(formData)
