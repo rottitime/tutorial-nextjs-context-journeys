@@ -3,7 +3,7 @@ import { getSessionServer } from '@/lib/session'
 
 const stepModules: Record<string, () => Promise<any>> = {
   personal: () => import('../steps/personal/page'),
-  info: () => import('../steps/info/page'), // 👈 added
+  info: () => import('../steps/info/page'),
   confirm: () => import('../steps/confirm/page'),
   complete: () => import('../steps/complete/page'),
 }

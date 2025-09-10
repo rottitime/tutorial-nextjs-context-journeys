@@ -9,7 +9,7 @@ export async function getSessionServer() {
 }
 
 export async function commitSession(session: any) {
-  cookies().set(SESSION_KEY, JSON.stringify(session), { path: '/' })
+  ;(await cookies()).set(SESSION_KEY, JSON.stringify(session), { path: '/' })
 }
 
 export async function flashSession(session: any, flash: any) {
