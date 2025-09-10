@@ -1,6 +1,15 @@
 // app/apply/[[...step]]/page.tsx
 import { getSessionServer } from '@/lib/session'
 
+// const teams = [
+//   'arsenal',
+//   'chelsea',
+//   'liverpool',
+//   'man-city',
+//   'man-utd',
+//   'tottenham',
+// ]
+
 const stepModules: Record<
   string,
   () => Promise<{
@@ -8,6 +17,8 @@ const stepModules: Record<
       flash: unknown
       values: unknown
       session: any
+      teamA?: string
+      teamB?: string
     }>
   }>
 > = {
@@ -20,6 +31,9 @@ const stepModules: Record<
   // Example: Multi-level nested routes for job applications
   'jobs/engineering/frontend': () =>
     import('../steps/jobs/engineering/frontend/page'),
+
+  // Dynamic team combinations
+  'teams/*': () => import('../steps/teams/dynamic/page'),
 }
 
 export default async function Page({
@@ -30,6 +44,8 @@ export default async function Page({
   const resolvedParams = await params
   const stepArray = resolvedParams.step ?? ['start']
 
+  console.log({ resolvedParams })
+
   // Handle nested URLs by joining the step array with slashes
   // Examples:
   // ['category', 'tech'] -> 'category/tech'
@@ -38,7 +54,16 @@ export default async function Page({
 
   const session = await getSessionServer()
 
-  if (!stepModules[currentStep]) {
+  // Check for dynamic team combinations (teams/teama/teamb)
+  let stepKey = currentStep
+  if (currentStep.startsWith('teams/') && stepArray.length === 3) {
+    const [, teamA, teamB] = stepArray
+    if (teamA && teamB && teamA !== teamB) {
+      stepKey = 'teams/*'
+    }
+  }
+
+  if (!stepModules[stepKey]) {
     return (
       <html>
         <body>
@@ -52,12 +77,20 @@ export default async function Page({
     )
   }
 
-  const mod = await stepModules[currentStep]()
+  const mod = await stepModules[stepKey]()
   const StepPage = mod.default
 
   // Store flash data - it will be cleared on next form submission
   const flashData = session.flash
-  console.log({ session })
+
+  // Extract team names for dynamic team pages
+  let teamA = ''
+  let teamB = ''
+  if (stepKey === 'teams/*' && stepArray.length === 3) {
+    const [, teamAFromUrl, teamBFromUrl] = stepArray
+    teamA = teamAFromUrl || ''
+    teamB = teamBFromUrl || ''
+  }
 
   return (
     <html>
@@ -84,6 +117,8 @@ export default async function Page({
           flash={flashData}
           values={flashData?.values}
           session={session}
+          teamA={teamA}
+          teamB={teamB}
         />
       </body>
     </html>
