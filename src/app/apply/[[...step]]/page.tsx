@@ -11,9 +11,10 @@ const stepModules: Record<string, () => Promise<any>> = {
 export default async function Page({
   params,
 }: {
-  params: { step?: string[] }
+  params: Promise<{ step?: string[] }>
 }) {
-  const currentStep = (params.step ?? ['start'])[0]
+  const resolvedParams = await params
+  const currentStep = (resolvedParams.step ?? ['start'])[0]
   const session = await getSessionServer()
 
   if (!stepModules[currentStep]) return <p>Step not found</p>
