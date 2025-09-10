@@ -8,24 +8,23 @@ export async function POST(req: Request) {
   try {
     const formData = Object.fromEntries(await (req as any).formData())
 
-    // Get current step from form data or referrer
-    let currentStep = formData.currentStep as string
-    if (!currentStep) {
-      const referer = req.headers.get('referer')
-      if (referer) {
-        const refererUrl = new URL(referer)
-        const pathSegments = refererUrl.pathname.split('/').filter(Boolean)
-        currentStep = pathSegments[1] || 'start' // /apply/step -> step
-      } else {
-        currentStep = 'start'
-      }
+    // Automatically detect current step from referrer URL
+    let currentStep = 'start'
+    const referer = req.headers.get('referer')
+    if (referer) {
+      const refererUrl = new URL(referer)
+      const pathSegments = refererUrl.pathname.split('/').filter(Boolean)
+      currentStep = pathSegments[1] || 'start' // /apply/step -> step
     }
+
+    // Automatically detect formId from current step (if it's a form step)
+    const formId = (formData.formId as string) || currentStep
 
     const session = await getSessionServer()
 
     // Check if this is a form step
-    if (formData.formId && validators[formData.formId]) {
-      const result = validators[formData.formId].safeParse(formData)
+    if (validators[formId]) {
+      const result = validators[formId].safeParse(formData)
       if (!result.success) {
         // Save errors + form values in flash
         await flashSession(session, {
@@ -48,7 +47,7 @@ export async function POST(req: Request) {
       // Save validated form data in session
       session.data = {
         ...(session.data || {}),
-        [formData.formId]: result.data,
+        [formId]: result.data,
       }
     } else {
       // Content-only step → just record that it was visited

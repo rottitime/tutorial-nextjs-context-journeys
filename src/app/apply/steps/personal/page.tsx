@@ -1,8 +1,6 @@
 export default function PersonalPage({ flash, values }: any) {
   return (
     <form method="post" action="/api/apply">
-      <input type="hidden" name="formId" value="personal" />
-      <input type="hidden" name="currentStep" value="personal" />
       <div>
         <label>First name</label>
         <input name="firstName" defaultValue={values?.firstName} />

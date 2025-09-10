@@ -1,7 +1,12 @@
 // app/apply/[[...step]]/page.tsx
 import { getSessionServer } from '@/lib/session'
 
-const stepModules: Record<string, () => Promise<any>> = {
+const stepModules: Record<
+  string,
+  () => Promise<{
+    default: React.ComponentType<{ flash: unknown; values: unknown }>
+  }>
+> = {
   personal: () => import('../steps/personal/page'),
   info: () => import('../steps/info/page'),
   confirm: () => import('../steps/confirm/page'),
