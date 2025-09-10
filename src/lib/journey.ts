@@ -9,7 +9,14 @@ type StepResolver = (ctx: StepContext) => Promise<string> | string
 
 const flow: Record<string, StepResolver> = {
   start: () => 'personal',
-  personal: () => 'info', // 👈 now goes to info page
+  personal: (ctx) => {
+    // If firstName is 'harry', jump directly to complete
+    if (ctx.formData.firstName === 'harry') {
+      return 'complete'
+    }
+    // Otherwise, go to info page
+    return 'info'
+  },
   info: () => 'confirm', // 👈 info → confirm
   confirm: () => 'complete',
   complete: () => 'complete',
