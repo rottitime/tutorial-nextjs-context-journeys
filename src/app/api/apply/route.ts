@@ -82,7 +82,10 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('API route error:', error)
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     )
   }
