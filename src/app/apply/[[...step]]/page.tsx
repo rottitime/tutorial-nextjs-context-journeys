@@ -42,7 +42,7 @@ export default async function Page({
   params: Promise<{ step?: string[] }>
 }) {
   const resolvedParams = await params
-  const stepArray = resolvedParams.step ?? ['start']
+  const stepArray = resolvedParams.step ?? ['personal']
 
   console.log({ resolvedParams })
 
