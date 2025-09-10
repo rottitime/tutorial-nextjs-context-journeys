@@ -1,5 +1,6 @@
 // app/apply/[[...step]]/page.tsx
-import { getSessionServer } from '@/lib/session'
+import { getSessionServer, commitSession } from '@/lib/session'
+import { userService } from '@/lib/user'
 
 // const teams = [
 //   'arsenal',
@@ -17,6 +18,7 @@ const stepModules: Record<
       flash: unknown
       values: unknown
       session: any
+      user?: any
       teamA?: string
       teamB?: string
     }>
@@ -53,6 +55,15 @@ export default async function Page({
   const currentStep = stepArray.join('/')
 
   const session = await getSessionServer()
+
+  // Fetch user data immediately on page load
+  const user = await userService.getUserWithCache(session)
+
+  // Store user data in session if not already cached
+  if (!session.user) {
+    session.user = user
+    await commitSession(session)
+  }
 
   // Check for dynamic team combinations (teams/teama/teamb)
   let stepKey = currentStep
@@ -117,6 +128,7 @@ export default async function Page({
           flash={flashData}
           values={flashData?.values}
           session={session}
+          user={user}
           teamA={teamA}
           teamB={teamB}
         />
