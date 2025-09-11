@@ -62,15 +62,11 @@ export async function POST(req: Request) {
       }
     }
 
-    // Get user data from session (should be available from page load)
-    const user = session.user
-
     // Figure out next step
     const nextStep = await resolveJourney({
       currentStep,
       formData,
       session,
-      user, // Pass user data for conditional journey logic
     })
 
     // Create response with redirect
