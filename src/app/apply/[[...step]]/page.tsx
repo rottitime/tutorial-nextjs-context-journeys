@@ -1,6 +1,6 @@
 // app/apply/[[...step]]/page.tsx
-import { getSessionServer, commitSession } from '@/lib/session'
-import { userService } from '@/lib/user'
+import { getSessionServer } from '@/lib/session'
+import { fetchUserData } from '@/lib/actions'
 
 // const teams = [
 //   'arsenal',
@@ -56,14 +56,9 @@ export default async function Page({
 
   const session = await getSessionServer()
 
-  // Fetch user data immediately on page load
-  const user = await userService.getUserWithCache(session)
-
-  // Store user data in session if not already cached
-  if (!session.user) {
-    session.user = user
-    await commitSession(session)
-  }
+  // Fetch user data immediately on page load using Server Action
+  const userResult = await fetchUserData()
+  const user = userResult.user
 
   // Check for dynamic team combinations (teams/teama/teamb)
   let stepKey = currentStep
